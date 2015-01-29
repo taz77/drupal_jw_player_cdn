@@ -1,3 +1,4 @@
 name = JW Player CDN
 description = A CDN Optimized JW Player
 package = media
+core = 7.x
