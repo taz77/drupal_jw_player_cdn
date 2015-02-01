@@ -113,18 +113,6 @@ function jw_player_cdn_installed_fields() {
 
 /**
  * Define the field instances for our content type.
- *
- * The instance lets Drupal know which widget to use to allow the user to enter
- * data and how to react in different view modes.  We are going to display a
- * page that uses a custom "node_example_list" view mode.  We will set a
- * cardinality of three allowing our content type to give the user three color
- * fields.
- *
- * This big array is factored into this function for readability.
- *
- * @return array
- *   An associative array specifying the instances we wish to add to our new
- *   node type.
  */
 function jw_player_cdn_installed_instances() {
   return array(
@@ -153,6 +141,11 @@ function jw_player_cdn_installed_instances() {
       'settings' => array(
         'text_processing' => 1,
         'user_register_form' => FALSE,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+        ),
       ),
     ),
   );
@@ -276,6 +269,26 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
   }
 
   $element['video'] = $widget;
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function jw_player_cdn_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  switch ($display['type']) {
+    case 'jw_player_video_series_instance_files':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          // See theme_html_tag().
+          '#type' => 'html_tag',
+          '#tag' => 'p',
+          '#value' => t('The color code in this field is @code', array('@code' => $item['video'])),
+        );
+      }
+      break;
+  }
   return $element;
 }
 
