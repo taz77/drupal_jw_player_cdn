@@ -81,18 +81,12 @@ function jw_player_cdn_node_type_insert($content_type) {
     foreach (jw_player_cdn_installed_fields() as $field) {
       field_create_field($field);
     }
-    $instance = array(
-      'entity_type' => 'node',
-      'bundle' => 'jw_player_cdn_video',
-      'field_name' => 'jw_player_cdn_video_series',
-      'label' => t('Videos for this series.'),
-      'widget' => array(
-        'type' => 'jw_player_cdn_video_series_widget',
-      ),
-    );
-    $instance['entity_type'] = 'node';
-    $instance['bundle'] = 'jw_player_cdn_video';
-    field_create_instance($instance);
+    // Create all the instances for our fields.
+    foreach (jw_player_cdn_installed_instances() as $instance) {
+      $instance['entity_type'] = 'node';
+      $instance['bundle'] = 'jw_player_cdn_video';
+      field_create_instance($instance);
+    }
   }
 }
 
@@ -105,6 +99,61 @@ function jw_player_cdn_installed_fields() {
       'field_name' => 'jw_player_cdn_video_series',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
       'type' => 'jw_player_cdn_video_series',
+    ),
+    'player_cdn_description' => array(
+      'field_name' => 'jw_player_cdn_video_desc',
+      'cardinality' => 1,
+      'type' => 'text_long',
+    //'default_widget' => 'text_textfield',
+    //'default_formatter' => 'text_default',
+    //'settings' => array('max_length' => ''),
+    )
+  );
+}
+
+/**
+ * Define the field instances for our content type.
+ *
+ * The instance lets Drupal know which widget to use to allow the user to enter
+ * data and how to react in different view modes.  We are going to display a
+ * page that uses a custom "node_example_list" view mode.  We will set a
+ * cardinality of three allowing our content type to give the user three color
+ * fields.
+ *
+ * This big array is factored into this function for readability.
+ *
+ * @return array
+ *   An associative array specifying the instances we wish to add to our new
+ *   node type.
+ */
+function jw_player_cdn_installed_instances() {
+  return array(
+    'jw_player_video_series_instance_files' => array(
+      'field_name' => 'jw_player_cdn_video_series',
+      'label' => t('Videos for this series.'),
+      'widget' => array(
+        'type' => 'jw_player_cdn_video_series_widget',
+        'weight' => 10,
+      ),
+    ),
+    'jw_player_video_series_instance_desc' => array(
+      'field_name' => 'jw_player_cdn_video_desc',
+      'label' => t('Description of this video series.'),
+      'type' => 'jw_player_cdn_video_desc',
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'rows' => 5,
+        ),
+        'type' => 'text_textarea',
+        'weight' => 1,
+      ),
+      'format' => 'filter_html',
+      'settings' => array(
+        'text_processing' => 1,
+        'user_register_form' => FALSE,
+      ),
     ),
   );
 }
@@ -183,7 +232,29 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
     // unavailable.
     // '#delta' => $delta,
   );
-
+  $widget['video_segment_title'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Segment Title',
+    '#size' => 100,
+    '#default_value' => '',
+    '#attributes' => array('class' => array('video-segment-title')),
+    '#description' => 'Title of this video segment or chapter',
+  );
+  $widget['video_segment_description'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Segment Description',
+    '#size' => 100,
+    '#default_value' => '',
+    '#attributes' => array('class' => array('video-segment-description')),
+    '#description' => 'Description of this video segment or chapter',
+  );
+  $widget['video_segment_legth'] = array(
+    '#type' => 'hms',
+    '#title' => 'Segment Length',
+    '#attributes' => array('class' => array('video-segment-description')),
+    '#description' => 'Length of this video segment or chapter. This is a HMS field type provided by HMS_field module. Format hh:mm:ss',
+    '#format' => 'h:mm:ss',
+  );
   // Create a textfield for saturation values for Red, Green, and Blue.
   foreach (array('video' => t('Video URL'), 'thumb' => t('Thumbnail URL')) as $key => $title) {
     if ($key == 'video') {

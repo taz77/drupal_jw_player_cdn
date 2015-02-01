@@ -1,4 +1,5 @@
 name = JW Player CDN
 description = A CDN Optimized JW Player
-package = media
+package = Media
 core = 7.x
+dependencies[] = hms_field

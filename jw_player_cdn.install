@@ -26,6 +26,8 @@ function jw_player_cdn_uninstall() {
   // Remove all instances attached to bundles.
   $instance = array('field_name' => 'jw_player_cdn_video_series', 'bundle' => 'jw_player_cdn_video', 'entity_type' => 'node');
   field_delete_instance($instance);
+  $instance = array('field_name' => 'jw_player_cdn_video_desc', 'bundle' => 'jw_player_cdn_video', 'entity_type' => 'node');
+  field_delete_instance($instance);
 
   // Finally delete the fields created by this module.
   $fields = array_keys(_jw_player_cdn_installed_fields());
@@ -48,5 +50,6 @@ function jw_player_cdn_uninstall() {
 function _jw_player_cdn_installed_fields() {
   return array(
     'jw_player_cdn_video_series',
+    'jw_player_cdn_video_desc',
   );
 }
