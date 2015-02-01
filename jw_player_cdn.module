@@ -159,7 +159,9 @@ function jw_player_cdn_installed_instances() {
 }
 
 /**
+ * **************************************************************************************
  * Field Creation Hooks and Information
+ * **************************************************************************************
  */
 
 /**
@@ -223,14 +225,9 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
   $widget = $element;
   $widget['#delta'] = $delta;
 
-  // Make this a fieldset with two text fields.
+  // Make this a fieldset with five fields.
   $widget += array(
     '#type' => 'fieldset',
-    //'#element_validate' => array('field_example_3text_validate'),
-    // #delta is set so that the validation function will be able
-    // to access external value information which otherwise would be
-    // unavailable.
-    // '#delta' => $delta,
   );
   $widget['video_segment_title'] = array(
     '#type' => 'textfield',
@@ -280,4 +277,24 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
 
   $element['video'] = $widget;
   return $element;
+}
+
+/**
+ * **************************************************************************************
+ * Themeing of Custom Node Type
+ * **************************************************************************************
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function jw_player_cdn_theme() {
+  $theme = array();
+  $theme['node__jw_player_cdn_video'] = array(
+    'render element' => 'content',
+    'base hook' => 'node',
+    'template' => 'node--jw_player_cdn_video',
+    'path' => drupal_get_path('module', 'jw_player_cdn') . '/templates',
+  );
+  return $theme;
 }
