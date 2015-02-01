@@ -4,3 +4,49 @@
  * @file
  * Install file for JW Player CDN Module.
  */
+
+/**
+ * Implements hook_uninstall().
+ */
+function jw_player_cdn_uninstall() {
+  // Find all nodes created for this module.
+  $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+  $result = db_query($sql, array(':type' => 'jw_player_cdn_video'));
+  $nids = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+  // Delete all the nodes at once.
+  node_delete_multiple($nids);
+
+  // Delete any comments associated with with the nodes created.
+  $instance = array('field_name' => 'comment_body', 'bundle' => 'jw_player_cdn_video', 'entity_type' => 'comment');
+  field_delete_instance($instance);
+
+  // Remove all instances attached to bundles.
+  $instance = array('field_name' => 'jw_player_cdn_video_series', 'bundle' => 'jw_player_cdn_video', 'entity_type' => 'node');
+  field_delete_instance($instance);
+
+  // Finally delete the fields created by this module.
+  $fields = array_keys(_jw_player_cdn_installed_fields());
+  foreach ($fields as $field) {
+    field_delete_field($field);
+  }
+  // Delete node type.
+  node_type_delete('jw_player_cdn_video');
+
+  // Purge all field infromation.
+  field_purge_batch(1000);
+
+  // Clear all caches to purge page caches that could have the node displays stored.
+  cache_clear_all();
+}
+
+/**
+ * Returns fields created by this module.
+ */
+function _jw_player_cdn_installed_fields() {
+  return array(
+    'jw_player_cdn_video_series',
+  );
+}

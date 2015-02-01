@@ -58,67 +58,53 @@ function jw_player_cdn_node_info() {
 }
 
 /**
+ * Implements hook_form().
+ *
+ * Drupal needs for us to provide a form that lets the user
+ * add content. This is the form that the user will see if
+ * they go to node/add/jw-player-cdn
+ *
+ * You can get fancy with this form, or you can just punt
+ * and return the default form that node_content will provide.
+ */
+function jw_player_cdn_form($node, $form_state) {
+  return node_content_form($node, $form_state);
+}
+
+/**
  * Implements hook_node_type_insert().
  */
 function jw_player_cdn_node_type_insert($content_type) {
+  echo $content_type->type;
   if ($content_type->type == 'jw_player_cdn_video') {
 
-    // Create all the fields we are adding to our content type.
-    foreach (_jw_player_cdn_fields() as $field) {
+    foreach (jw_player_cdn_installed_fields() as $field) {
       field_create_field($field);
     }
-
-    // Create all the instances for our fields.
-    foreach (_jw_player_cdn_installed_instances() as $instance) {
-      $instance['entity_type'] = 'node';
-      $instance['bundle'] = 'jw_player_cdn_video';
-      field_create_instance($instance);
-    }
+    $instance = array(
+      'entity_type' => 'node',
+      'bundle' => 'jw_player_cdn_video',
+      'field_name' => 'jw_player_cdn_video_series',
+      'label' => t('Videos for this series.'),
+      'widget' => array(
+        'type' => 'jw_player_cdn_video_series_widget',
+      ),
+    );
+    $instance['entity_type'] = 'node';
+    $instance['bundle'] = 'jw_player_cdn_video';
+    field_create_instance($instance);
   }
 }
 
 /**
- * Define the fields for our custom content type.
- *
- * This big array is factored into this function for readability.
- *
- * @return array
- *   An associative array specifying the fields we wish to add to our
- *   new node type.
+ * Returns fields created by this module.
  */
-function _jw_player_cdn_fields() {
+function jw_player_cdn_installed_fields() {
   return array(
-    'jw_player_cdn_video' => array(
-      'field_name' => 'jw_player_cdn_video_files',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-      'type' => 'jw_player_cdn_video',
-    ),
-  );
-}
-
-/**
- * Define the field instances for our content type.
- *
- * The instance lets Drupal know which widget to use to allow the user to enter
- * data and how to react in different view modes.  We are going to display a
- * page that uses a custom "node_example_list" view mode.  We will set a
- * cardinality of three allowing our content type to give the user three color
- * fields.
- *
- * This big array is factored into this function for readability.
- *
- * @return array
- *   An associative array specifying the instances we wish to add to our new
- *   node type.
- */
-function _jw_player_cdn_installed_instances() {
-  return array(
-    'jw_player_cdn_video' => array(
+    'player_cdn_files' => array(
       'field_name' => 'jw_player_cdn_video_series',
-      'label' => t('Videos for this series.'),
-      'widget' => array(
-        'type' => 'field_jw_player_cdn_video_series',
-      ),
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'type' => 'jw_player_cdn_video_series',
     ),
   );
 }
@@ -133,7 +119,7 @@ function _jw_player_cdn_installed_instances() {
 function jw_player_cdn_field_info() {
   return array(
     // We name our field as the associative name of the array.
-    'field_jw_player_cdn_video_series' => array(
+    'jw_player_cdn_video_series' => array(
       'label' => t('JW Player CDN Video Entries'),
       'description' => t('Video Series Playlist.'),
       'default_widget' => 'jw_player_cdn_video_series_widget',
@@ -163,7 +149,7 @@ function jw_player_cdn_field_formatter_info() {
     // This formatter just displays the hex value in the color indicated.
     'jw_player_cdn_video_series_formatter' => array(
       'label' => t('Simple text-based formatter'),
-      'field types' => array('field_jw_player_cdn_video_series'),
+      'field types' => array('jw_player_cdn_video_series'),
     ),
   );
 }
@@ -175,7 +161,7 @@ function jw_player_cdn_field_widget_info() {
   return array(
     'jw_player_cdn_video_series_widget' => array(
       'label' => t('Video Series Information'),
-      'field types' => array('field_jw_player_cdn_video_series'),
+      'field types' => array('jw_player_cdn_video_series'),
     ),
   );
 }
