@@ -71,7 +71,7 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
     '#type' => 'textfield',
     '#title' => 'Segment Title',
     '#size' => 100,
-    '#default_value' => '',
+    '#default_value' => isset($items[$delta]['video_segment_title']) ? $items[$delta]['video_segment_title'] : '',
     '#attributes' => array('class' => array('video-segment-title')),
     '#description' => 'Title of this video segment or chapter',
   );
@@ -79,16 +79,17 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
     '#type' => 'textfield',
     '#title' => 'Segment Description',
     '#size' => 100,
-    '#default_value' => '',
+    '#default_value' => isset($items[$delta]['video_segment_description']) ? $items[$delta]['video_segment_description'] : '',
     '#attributes' => array('class' => array('video-segment-description')),
     '#description' => 'Description of this video segment or chapter',
   );
   $element['video_segment_legth'] = array(
-    '#type' => 'hms',
+    '#type' => 'textfield',
     '#title' => 'Segment Length',
     '#attributes' => array('class' => array('video-segment-description')),
     '#description' => 'Length of this video segment or chapter. This is a HMS field type provided by HMS_field module. Format hh:mm:ss',
-    '#format' => 'h:mm:ss',
+    '#default_value' => isset($items[$delta]['video_segment_legth']) ? $items[$delta]['video_segment_legth'] : '',
+    //'#format' => 'h:mm:ss',
   );
   foreach (array('video' => t('Video URL'), 'thumb' => t('Thumbnail URL')) as $key => $title) {
     if ($key == 'video') {
@@ -101,7 +102,7 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
       '#type' => 'textfield',
       '#title' => $title,
       '#size' => 100,
-      '#default_value' => '',
+      '#default_value' => isset($items[$delta][$key]) ? $items[$delta][$key] : '',
       '#attributes' => array('class' => array('video-entry')),
       '#description' => $description,
     );
@@ -111,8 +112,6 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
       $element[$key]['#required'] = 1;
     }
   }
-
-  //$element['video'] = $widget;
   return $element;
 }
 

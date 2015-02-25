@@ -6,6 +6,46 @@
  */
 
 /**
+ * Implements hook_field_schema().
+ */
+function jw_player_cdn_field_schema($field) {
+
+      $columns = array(
+        'video_segment_title' => array(
+          'type' => 'varchar',
+          'length' => 512,
+          'default' => '',
+        ),
+        'video_segment_description' => array(
+          'type' => 'varchar',
+          'length' => 512,
+          'default' => '',
+        ),
+        'video_segment_legth' => array(
+          'type' => 'varchar',
+          'length' => 512,
+          'default' => '',
+        ),
+        'video' => array(
+          'type' => 'varchar',
+          'length' => 512,
+          'default' => '',
+        ),
+        'thumb' => array(
+          'type' => 'varchar',
+          'length' => 512,
+          'default' => '',
+        ),
+      );
+      $indexes = array();
+  
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes
+  );
+}
+
+/**
  * Implements hook_uninstall().
  */
 function jw_player_cdn_uninstall() {
