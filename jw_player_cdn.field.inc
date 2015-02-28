@@ -106,8 +106,8 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
       '#attributes' => array('class' => array('video-entry')),
       '#description' => $description,
     );
-    // Since Form API doesn't allow a fieldset to be required, we
-    // have to require each field element individually.
+    // Since Form API doesn't allow a fieldset to be required, we have to require each
+    //  field element individually.
     if ($instance['required'] == 1) {
       $element[$key]['#required'] = 1;
     }
@@ -121,19 +121,9 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
 function jw_player_cdn_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
   foreach ($items as $delta => $item) {
-    kpr($item);
-    /* $element[$delta] = array(
-      // We create a render array to produce the desired markup,
-      // "<p style="color: #hexcolor">The color code ... #hexcolor</p>".
-      // See theme_html_tag().
-      '#type' => 'html_tag',
-      '#tag' => 'p',
-      '#attributes' => array(
-      'style' => 'color: ' . $item['rgb'],
-      ),
-      '#value' => t('The color code in this field is @code', array('@code' => $item['rgb'])),
-      ); */
+    // Get the actual values of the fields
+    // $video_series = $item['safe_value'];
+    $element[$delta] = $item;
   }
-
   return $element;
 }
