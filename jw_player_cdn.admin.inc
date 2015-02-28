@@ -11,6 +11,18 @@
 function jw_player_cdn_admin($form, &$form_state) {
 
   $form = array();
+  $form['jw_player_cdn_license'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('JW Player License Key'),
+    '#collapsible' => FALSE,
+  );
+  $form['jw_player_cdn_license']['jw_player_cdn_license_key'] = array(
+    '#type' => 'textfield',
+    '#size' => '100',
+    '#title' => t('Key'),
+    '#default_value' => variable_get('jw_player_cdn_license_key', ''),
+    '#description' => t('This is required to use the advanced functions of JW Player such as Ads and Analytics. Also required if you are using this on a commercial website.'),
+  );
   $form['jw_player_cdn_cloudfront_intro'] = array(
     '#markup' => t('This module is built to only use AWS Cloudfront at this time and is based on a specific use case which may not fulfil your needs.'),
   );
