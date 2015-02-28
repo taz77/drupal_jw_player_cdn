@@ -4,7 +4,6 @@
  * @file
  * Module file for JW Player CDN Module.
  */
-
 // Load all Field module hooks.
 module_load_include('inc', 'jw_player_cdn', 'jw_player_cdn.field');
 
@@ -158,8 +157,6 @@ function jw_player_cdn_installed_instances() {
   );
 }
 
-
-
 /**
  * **************************************************************************************
  * Themeing of Custom Node Type
@@ -178,4 +175,16 @@ function jw_player_cdn_theme() {
     'path' => drupal_get_path('module', 'jw_player_cdn') . '/templates',
   );
   return $theme;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function jw_player_cdn_preprocess_node(&$variables) {
+  $node = & $variables['node'];
+  // Add JS only to the node type for CDN Video.
+  if ($node->type == 'jw_player_cdn_video') {
+    drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
+    drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
+  }
 }
