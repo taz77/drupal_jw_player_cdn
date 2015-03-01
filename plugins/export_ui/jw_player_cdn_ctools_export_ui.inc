@@ -5,10 +5,10 @@
  */
 $plugin = array(
   'schema' => 'jw_player_cdn_preset',
-  'access' => 'administer JW Player presets',
+  'access' => 'administer jwplayer cdn module',
   'menu' => array(
     'menu item' => 'jw_player_cdn',
-    'menu title' => 'JW Player CDN presets',
+    'menu title' => 'JW Player CDN Presets',
     'menu prefix' => 'admin/config/media',
     'menu description' => 'Administer JW Player CDN presets.',
   ),
@@ -138,7 +138,7 @@ function jw_player_cdn_ctools_export_ui_form(&$form, &$form_state) {
 /**
  * Valdiator for jw_player_ctools_export_ui_form().
  */
-function jw_player_ctools_export_ui_form_validate($form, &$form_state) {
+function jw_player_cdn_ctools_export_ui_form_validate($form, &$form_state) {
   $vals = $form_state['values'];
   if (!is_numeric($vals['settings']['width'])) {
     form_set_error('width', 'Only numeric values allowed for width' );

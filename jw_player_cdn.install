@@ -128,7 +128,17 @@ function jw_player_cdn_uninstall() {
 
   // Purge all field infromation.
   field_purge_batch(1000);
-
+  
+  // Delete variables.
+  variable_del('jw_player_cdn_license_key');
+  variable_del('jw_player_cdn_cloudfront_akey');
+  variable_del('jw_player_cdn_cloudfront_skey');
+  variable_del('jw_player_cdn_static_url_jwplayer');
+  variable_del('jw_player_cdn_static_url_logo');
+  variable_del('jw_player_cdn_static_url_skin');
+  
+  db_drop_table('jw_player_cdn_preset');
+  
   // Clear all caches to purge page caches that could have the node displays stored.
   cache_clear_all();
 }

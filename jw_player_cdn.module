@@ -12,7 +12,7 @@ module_load_include('inc', 'jw_player_cdn', 'jw_player_cdn.field');
  */
 function jw_player_cdn_menu() {
   $items = array();
-  $items['admin/config/services/jw-player-cdn'] = array(
+  $items['admin/config/media/jw_player_cdn/settings'] = array(
     'title' => 'JW Player CDN Admin Page',
     'description' => 'JW Player CDN Setting Page',
     'page callback' => 'drupal_get_form',
@@ -186,5 +186,24 @@ function jw_player_cdn_preprocess_node(&$variables) {
   if ($node->type == 'jw_player_cdn_video') {
     drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
     drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function jw_player_cdn_ctools_plugin_api($owner, $api) {
+  if ($owner == 'jw_player_cdn' && $api == 'jw_player_cdn_presets') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function jw_player_cdn_ctools_plugin_directory($module, $type) {
+  // Load the export_ui plugin.
+  if ($type =='export_ui') {
+    return 'plugins/export_ui';
   }
 }
