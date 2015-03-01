@@ -31,13 +31,10 @@ INSTALLATION
 
 To be written if this gets promoted to full project status.
 
-EMBEDDED PLAYER
+THANKS AND ACKNOWLEDGEMENTS
 
-This module supports embedding the video player anywhere in Drupal using the
-token system. You are free to choose whatever method that you would like to 
-display the token.
-
-If you want a quick and easy way to put it into content. You can download the
-module Token Filter https://www.drupal.org/project/token_filter
+A lot of the code here was borrowed from the JW Player for Drupal 7 Module. The
+two modules share a lot of the same common functions.
+https://www.drupal.org/project/jw_player
 ____________________________________________________________________________
 http://www.fastglass.net
