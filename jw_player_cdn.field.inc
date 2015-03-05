@@ -25,8 +25,7 @@ function jw_player_cdn_field_info() {
  * Implements hook_field_is_empty().
  */
 function jw_player_cdn_field_is_empty($item, $field) {
-  //return empty($item['video']);
-  return FALSE;
+  return empty($item['video']);
 }
 
 /**
@@ -89,7 +88,7 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
     '#attributes' => array('class' => array('video-segment-description')),
     '#description' => 'Length of this video segment or chapter. This is a HMS field type provided by HMS_field module. Format hh:mm:ss',
     '#default_value' => isset($items[$delta]['video_segment_legth']) ? $items[$delta]['video_segment_legth'] : '',
-    //'#format' => 'h:mm:ss',
+      //'#format' => 'h:mm:ss',
   );
   foreach (array('video' => t('Video URL'), 'thumb' => t('Thumbnail URL')) as $key => $title) {
     if ($key == 'video') {
@@ -107,7 +106,7 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
       '#description' => $description,
     );
     // Since Form API doesn't allow a fieldset to be required, we have to require each
-    //  field element individually.
+    // field element individually.
     if ($instance['required'] == 1) {
       $element[$key]['#required'] = 1;
     }
@@ -121,9 +120,14 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
 function jw_player_cdn_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
   foreach ($items as $delta => $item) {
-    // Get the actual values of the fields
-    // $video_series = $item['safe_value'];
-    $element[$delta] = $item;
+    // Get the actual values of the fields.
+    $element[$delta] = array(
+      '#theme' => 'jw_player_cdn_video_segment',
+      '#segment_title' => $item['video_segment_title'],
+      '#segment_desc' => $item['video_segment_description'],
+      '#segment_length' => $item['video_segment_legth'],
+      '#segment_thumbnail' => $item['thumb'],
+    );
   }
   return $element;
 }
