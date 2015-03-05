@@ -18,9 +18,9 @@
       hide($content['links']);
       // Print the description of the Video Series
       print render($content['jw_player_cdn_video_desc']);
-      print render($content['jw_player_cdn_video_series']);
       $options = drupal_get_query_parameters();
-      kpr($content);
+      print render($content['jw_player_cdn_video_series']);
+      
     ?>
   </div>
   
