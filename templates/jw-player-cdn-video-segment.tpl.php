@@ -9,12 +9,15 @@
  * - $segment_length: The style settings for the embed code
  * - $segment_thumb: The name of the video handler
  */
-?>
 
+// Build a url query string for the linking of the video segements.
+$query = array();
+$query['vid'] = $vid;
+?>
 <div class="jw-player-cdn">
   <div class="jw-player-cdn-video-series">
     <div class="jw-player-cdn-video-series-title">
-      <?php print $segment_title; ?>
+      <a href="<?php echo url(current_path(), array('query' => $query)); ?>"><?php print $segment_title; ?></a>
     </div>
     <div class="jw-player-cdn-video-series-desc">
       <?php print $segment_desc; ?>
@@ -23,7 +26,7 @@
       <?php print $segment_length; ?>
     </div>
     <div class="jw-player-cdn-video-series-thumb">
-      <?php print $segment_title; ?>
+      <a href="<?php print $segment_thumbnail; ?>">Thumbnail Link</a>
     </div>
   </div>
 </div>
