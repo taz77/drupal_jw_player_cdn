@@ -27,6 +27,16 @@ invalidates XML due to characters in the string.
 This is why the approach taken by this module to play multiple chapters was 
 taken.
 
+Frankfurt Region
+
+Amazon has chosen to force version 4 signing of URLs for the Frankfurt region
+S3 buckets with no backward compatibility. This is in contrast to every other 
+region within the AWS ecosystem. This module does not support v4 signing because
+there are some underlying issues with the signing and Frankfurt region that 
+we cannot solve, see here: https://github.com/aws/aws-sdk-php/issues/483
+
+Make sure your assets for videos are not in the Frankfurt S3 region!
+
 INSTALLATION
 
 To be written if this gets promoted to full project status.
