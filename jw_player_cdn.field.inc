@@ -123,10 +123,11 @@ function jw_player_cdn_field_formatter_view($entity_type, $entity, $field, $inst
     // Get the actual values of the fields.
     $element[$delta] = array(
       '#theme' => 'jw_player_cdn_video_segment',
+      '#vid' => $delta,
       '#segment_title' => $item['video_segment_title'],
       '#segment_desc' => $item['video_segment_description'],
       '#segment_length' => $item['video_segment_legth'],
-      '#segment_thumbnail' => $item['thumb'],
+      '#segment_thumbnail' => jw_player_cdn_cloudfront_sign_url($item['thumb']),
     );
   }
   return $element;
