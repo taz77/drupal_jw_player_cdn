@@ -7,19 +7,22 @@
 // Load all Field module hooks.
 module_load_include('inc', 'jw_player_cdn', 'jw_player_cdn.field');
 
+// Load services
+module_load_include('inc', 'jw_player_cdn', 'services/cloudfront');
+
 /**
  * Implements hook_menu().
  */
 function jw_player_cdn_menu() {
   $items = array();
   $items['admin/config/media/jw_player_cdn/settings'] = array(
-    'title' => 'JW Player CDN Admin Page',
+    'title' => 'JW Player CDN Settings',
     'description' => 'JW Player CDN Setting Page',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('jw_player_cdn_admin'),
     'access arguments' => array('administer jwplayer cdn module'),
     'file' => 'jw_player_cdn.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_LOCAL_TASK,
   );
   return $items;
 }
@@ -158,9 +161,9 @@ function jw_player_cdn_installed_instances() {
 }
 
 /**
- * **************************************************************************************
+ * ****************************************************************************
  * Themeing of Custom Node Type
- * **************************************************************************************
+ * ****************************************************************************
  */
 
 /**
@@ -182,6 +185,7 @@ function jw_player_cdn_theme() {
       'segment_desc' => NULL,
       'segment_length' => NULL,
       'segment_thumbnail' => NULL,
+      'vid' => NULL,
     ),
   );
   return $theme;
