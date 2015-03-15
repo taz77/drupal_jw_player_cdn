@@ -2,11 +2,7 @@
 
 /**
  * @file
- * Provides admin settings form(s) for Freshdesk module.
- */
-
-/**
- * The form to provide admin settings for the SS Newsletter Module.
+ * Provides admin settings form(s) for JW Player CDN module.
  */
 function jw_player_cdn_admin($form, &$form_state) {
 
@@ -40,13 +36,38 @@ function jw_player_cdn_admin($form, &$form_state) {
     '#title' => t('Access Key ID'),
     '#default_value' => variable_get('jw_player_cdn_cloudfront_akey', ''),
     '#description' => t('Obtain this from the AWS IAM console.'),
+    '#required' => TRUE,
   );
   $form['jw_player_cdn_cloudfront']['jw_player_cdn_cloudfront_skey'] = array(
     '#type' => 'textfield',
     '#size' => '150',
     '#title' => t('Secret Access Key'),
-    '#default_value' => variable_get('jw_player_cdn_cloudfront_skey', ''),
-    '#description' => t('Obtain this from the AWS IAM console.'),
+    '#default_value' => '',
+    '#description' => t('Obtain this from the AWS IAM console. Key never shown for security'),
+  );
+  $form['jw_player_cdn_cloudfront']['cf_signed_notice_2'] = array(
+    '#markup' => '<p>' . t('If you have not created a Cloudfront Key Pair.  You must stop this process and go complete those steps first. Note: creating and setting up Cloudfront distribution changes can take a long time.') . ' ' . l('Link to AWS Security Credentials page', 'https://console.aws.amazon.com/iam/home?#security_credential', array('external' => TRUE)) . '</p>',
+  );
+  $form['jw_player_cdn_cloudfront']['jw_player_cdn_cloudfront_cf_key_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Cloudfront key pair ID'),
+    '#default_value' => variable_get('jw_player_cdn_cloudfront_cf_key_id', FALSE) ? variable_get('jw_player_cdn_cloudfront_cf_key_id') : '',
+    '#description' => t('This is the Key Pair ID provided by Amazon for your Cloudfront key that you have created.'),
+    '#required' => TRUE,
+  );
+  $form['jw_player_cdn_cloudfront']['jw_player_cdn_cloudfront_cf_key_contents'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Cloudfront Private key contents'),
+    '#default_value' => variable_get('jw_player_cdn_cloudfront_cf_key_contents', FALSE) ? variable_get('jw_player_cdn_cloudfront_cf_key_contents') : '',
+    '#description' => t('This is the contents of the Private Key downloaded from Amazon.  Paste in the ENTIRE contents of the downloaded PEM file. The file should start with "-----BEGIN RSA PRIVATE KEY-----" and end with "-----END RSA PRIVATE KEY-----".'),
+    '#required' => TRUE,
+  );
+  $form['jw_player_cdn_cloudfront']['jw_player_cdn_cloudfront_timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Timeout for Assets'),
+    '#default_value' => variable_get('jw_player_cdn_cloudfront_timeout', FALSE) ? variable_get('jw_player_cdn_cloudfront_timeout') : '300',
+    '#description' => t('Timeout used for signing of URLs. This number will specify - in seconds - how long a URL is valid.'),
+    '#required' => TRUE,
   );
   $form['jw_player_cdn_static_url_intro'] = array(
     '#markup' => '<strong>' . t('The following URLs must be in a separate distribution from your video files. This distribution is not protected with signed URLs.') . '</strong>',
@@ -57,6 +78,7 @@ function jw_player_cdn_admin($form, &$form_state) {
     '#title' => t('JW Player 6 Path'),
     '#description' => t('Location of JS API File and SWF file provided to you by JW Player. Contained here MUST be jwplayer.js and player.swf and exactly those file names.'),
     '#default_value' => variable_get('jw_player_cdn_static_url_jwplayer', ''),
+    '#required' => TRUE,
   );
   $form['jw_player_cdn_static_url_logo'] = array(
     '#type' => 'textfield',
