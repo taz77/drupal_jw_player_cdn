@@ -55,7 +55,7 @@ function jw_player_cdn_ctools_export_ui_form(&$form, &$form_state) {
     '#type' => 'machine_name',
     '#default_value' => $preset->machine_name,
     '#machine_name' => array(
-      'exists' => 'jw_player_preset_load',
+      'exists' => 'jw_player_cdn_preset_load',
       'source' => array('preset_name'),
     ),
     '#weight' => 1,
