@@ -128,6 +128,8 @@ function jw_player_cdn_field_formatter_view($entity_type, $entity, $field, $inst
       '#segment_desc' => $item['video_segment_description'],
       '#segment_length' => $item['video_segment_legth'],
       '#segment_thumbnail' => jw_player_cdn_cloudfront_sign_url($item['thumb']),
+      '#thumbnail_height' => variable_get('jw_player_cdn_thumbnail_height', 80),
+      '#thumbnail_width' => variable_get('jw_player_cdn_thumbnail_width', 120),
     );
   }
   return $element;
