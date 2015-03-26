@@ -1,11 +1,10 @@
 (function ($) {
-
   /**
    * Attaches a JW Player element by using the JW Player Javascript Library
    */
   Drupal.behaviors.JWPlayer = {
     attach: function(context) {
-      var players = Drupal.settings.jw_player;
+      var players = Drupal.settings.jw_player_cdn;
       $.each(players, function(player_id, config) {
         if ($('#' + player_id, context).length) {
           jwplayer(player_id).setup(config);
@@ -19,5 +18,4 @@
       });
     }
   };
-
 })(jQuery);
