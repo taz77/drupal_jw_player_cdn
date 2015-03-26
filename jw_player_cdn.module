@@ -67,7 +67,7 @@ function jw_player_cdn_node_info() {
  *
  * Drupal needs for us to provide a form that lets the user
  * add content. This is the form that the user will see if
- * they go to node/add/jw-player-cdn
+ * they go to node/add/jw-player-cdn.
  *
  * You can get fancy with this form, or you can just punt
  * and return the default form that node_content will provide.
@@ -176,6 +176,9 @@ function jw_player_cdn_theme() {
     'base hook' => 'node',
     'template' => 'node--jw_player_cdn_video',
     'path' => drupal_get_path('module', 'jw_player_cdn') . '/templates',
+    'variables' => array(
+      'jw_player_markup' => NULL,
+    ),
   );
   $theme['jw_player_cdn_video_segment'] = array(
     'template' => 'jw-player-cdn-video-segment',
@@ -186,6 +189,8 @@ function jw_player_cdn_theme() {
       'segment_length' => NULL,
       'segment_thumbnail' => NULL,
       'vid' => NULL,
+      'thumbnail_height' => NULL,
+      'thumbnail_width' => NULL,
     ),
   );
   return $theme;
@@ -198,8 +203,23 @@ function jw_player_cdn_preprocess_node(&$variables) {
   $node = & $variables['node'];
   // Add JS only to the node type for CDN Video.
   if ($node->type == 'jw_player_cdn_video') {
+    $options = array();
+    $options = drupal_get_query_parameters();
+    if (isset($options['vid'])) {
+      $vid = check_plain($options['vid']);
+    }
+    else {
+      $vid = 0;
+    }
+    $variables['jw_player_markup'] = _jw_player_markup($vid, $node->nid);
     drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
     drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
+    // Set the JW Player License if it has been supplied in settings.
+    $license = variable_get('jw_player_cdn_license_key', NULL);
+    if (!empty($license)) {
+      $jshead = '<script type="text/javascript">jwplayer.key="' . $license . '";</script>';
+      drupal_add_js($jshead);
+    }
   }
 }
 
@@ -219,5 +239,46 @@ function jw_player_cdn_ctools_plugin_directory($module, $type) {
   // Load the export_ui plugin.
   if ($type == 'export_ui') {
     return 'plugins/export_ui';
+  }
+}
+
+/**
+ * Private function to create the JW Player Markup and return for a theme var.
+ */
+function _jw_player_markup($vidload, $nid = NULL) {
+  $nodeinfo = node_load($nid);
+  $video = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['video']);
+  $thumb = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['thumb']);
+  $vars = &drupal_static(__FUNCTION__, array());
+  // @TODO Implement presets using CTools.
+  $mode = 'html5';
+  $height = 620;
+  $width = 360;
+  $controlbar = 'bottom';
+  $vars['jw_player_markup'] = '<p>TESTTESTTEST ' . $vidload . ' DELTA</p><p>NODE ID ' . $nid . '</p>';
+  return isset($vars['jw_player_markup']) ? $vars['jw_player_markup'] : NULL;
+}
+
+/**
+ * Load the given preset(s).
+ * @param string $machine_name
+ * @return array
+ */
+function jw_player_cdn_preset_load($machine_name = NULL) {
+  ctools_include('export');
+  if (isset($machine_name)) {
+    $items = ctools_export_crud_load('jw_player_cdn_preset', $machine_name);
+    // CTools returns an object, so we explictly typecast it to array before
+    // returning.
+    return $items = (array) $items;
+  }
+  else {
+    $result = ctools_export_crud_load_all('jw_player_cdn_preset');
+    if (!empty($result)) {
+      foreach ($result as $key => $item) {
+        $items[$key] = (array) $item;
+      }
+      return $items;
+    }
   }
 }
