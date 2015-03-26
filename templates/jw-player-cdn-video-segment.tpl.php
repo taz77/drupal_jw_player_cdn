@@ -8,11 +8,25 @@
  * - $segment_desc: The style name of the embed code to use
  * - $segment_length: The style settings for the embed code
  * - $segment_thumb: The name of the video handler
+ * - $vid: Delta of the video to load
+ * - $thumbnail_height: Thumbnail height
+ * - $thumbnail_width: Thumbnail width
  */
-
 // Build a url query string for the linking of the video segements.
 $query = array();
 $query['vid'] = $vid;
+
+// Process the thumbnail.
+$variables = array(
+  'path' => $segment_thumbnail,
+  'alt' => $segment_title,
+  'title' => 'Video Thumbnail',
+  'width' => $thumbnail_width,
+  'height' => $thumbnail_height,
+  'align' => 'absmiddle',
+  'attributes' => array('style' => 'vertical-align: middle'),
+);
+$image = theme('image', $variables);
 ?>
 <div class="jw-player-cdn">
   <div class="jw-player-cdn-video-series">
@@ -26,7 +40,7 @@ $query['vid'] = $vid;
       <?php print $segment_length; ?>
     </div>
     <div class="jw-player-cdn-video-series-thumb">
-      <a href="<?php print $segment_thumbnail; ?>">Thumbnail Link</a>
+      <?php print $image; ?>
     </div>
   </div>
 </div>
