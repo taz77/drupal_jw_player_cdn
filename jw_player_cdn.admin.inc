@@ -94,6 +94,20 @@ function jw_player_cdn_admin($form, &$form_state) {
     '#description' => t('URL of the skin including the filename.'),
     '#default_value' => variable_get('jw_player_cdn_static_url_skin', ''),
   );
-
+  $form['jw_player_cdn_thumbnail'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Video Segment Thumbnail Settings'),
+    '#collapsible' => FALSE,
+  );
+  $form['jw_player_cdn_thumbnail']['jw_player_cdn_thumbnail_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Thumbnail Width'),
+    '#default_value' => variable_get('jw_player_cdn_thumbnail_width', FALSE) ? variable_get('jw_player_cdn_thumbnail_width') : '120',
+  );
+  $form['jw_player_cdn_thumbnail']['jw_player_cdn_thumbnail_height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Thumbnail Height'),
+    '#default_value' => variable_get('jw_player_cdn_thumbnail_height', FALSE) ? variable_get('jw_player_cdn_thumbnail_height') : '80',
+  );
   return system_settings_form($form);
 }
