@@ -211,9 +211,34 @@ function jw_player_cdn_preprocess_node(&$variables) {
     else {
       $vid = 0;
     }
-    $variables['jw_player_markup'] = _jw_player_markup($vid, $node->nid);
+    // Load defaults as the starting point.
+    $default_settings = jw_player_cdn_default_settings();
+    // Give each instance of the player a unique id. A random hash is used in
+    // place of drupal_html_id() due to potentially conflicting ids in cases where
+    // the entire output of the theme function is cached.
+    $variables['html_id'] = md5(rand());
+    
+    $variables['jw_player_cdn_video_data'] = _jw_player_video_load($vid, $node->nid);
+    $variables['file_url'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
+    // Create a configuration array which will be passed to JWPlayer's JavaScript.
+    $variables['config']['file'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
+    $variables['image'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_thumb'];
+    // @TODO Implement presets using CTools.
+    // Merge all variables together. Preset settings take priority over defaults,
+    // variables passed directly to the theme function take priority over both.
+    $variables = array_merge($default_settings, $variables);
+    // Copy player variables into their own array to be set as JavaScript
+    // configuration.
+    // @todo Bad smell here. Refactoring needed.
+    $player_variables = array('width', 'height', 'image', 'controls', 'skin', 'autoplay');
+    foreach ($player_variables as $key) {
+      if (!empty($variables[$key])) {
+        $variables['config'][$key] = $variables[$key];
+      }
+    }
     drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
     drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
+    drupal_add_js(array('jw_player_cdn' => array($variables['html_id'] => $variables['config'])), 'setting'); // Player settings
     // Set the JW Player License if it has been supplied in settings.
     $license = variable_get('jw_player_cdn_license_key', NULL);
     if (!empty($license)) {
@@ -243,20 +268,14 @@ function jw_player_cdn_ctools_plugin_directory($module, $type) {
 }
 
 /**
- * Private function to create the JW Player Markup and return for a theme var.
+ * Private function to return video data details as signed URLs.
  */
-function _jw_player_markup($vidload, $nid = NULL) {
+function _jw_player_video_load($vidload, $nid = NULL) {
   $nodeinfo = node_load($nid);
-  $video = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['video']);
-  $thumb = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['thumb']);
-  $vars = &drupal_static(__FUNCTION__, array());
-  // @TODO Implement presets using CTools.
-  $mode = 'html5';
-  $height = 620;
-  $width = 360;
-  $controlbar = 'bottom';
-  $vars['jw_player_markup'] = '<p>TESTTESTTEST ' . $vidload . ' DELTA</p><p>NODE ID ' . $nid . '</p>';
-  return isset($vars['jw_player_markup']) ? $vars['jw_player_markup'] : NULL;
+  $vars = array();
+  $vars['jw_video_cdn_video'] = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['video']);
+  $vars['jw_video_cdn_thumb'] = jw_player_cdn_cloudfront_sign_url($nodeinfo->jw_player_cdn_video_series['und'][$vidload]['thumb']);
+  return $vars;
 }
 
 /**
@@ -281,4 +300,24 @@ function jw_player_cdn_preset_load($machine_name = NULL) {
       return $items;
     }
   }
+}
+
+/**
+ * Returns the default settings for JW Player CDN. Used in cases where a preset is
+ * not provided when the JW Player CDN theme function is called.
+ */
+function jw_player_cdn_default_settings() {
+  $defaults = &drupal_static(__FUNCTION__);
+
+  if (!isset($defaults)) {
+    $defaults = array(
+      'flashplayer' => file_create_url(libraries_get_path('jwplayer') . '/jwplayer.flash.swf'),
+      'width' => '640',
+      'height' => '480',
+      'autoplay' => FALSE,
+      'controls' => 'bottom',
+    );
+  }
+
+  return $defaults;
 }
