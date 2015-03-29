@@ -217,19 +217,34 @@ function jw_player_cdn_preprocess_node(&$variables) {
     // place of drupal_html_id() due to potentially conflicting ids in cases where
     // the entire output of the theme function is cached.
     $variables['html_id'] = md5(rand());
-    
+
     $variables['jw_player_cdn_video_data'] = _jw_player_video_load($vid, $node->nid);
     $variables['file_url'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
     // Create a configuration array which will be passed to JWPlayer's JavaScript.
     $variables['config']['file'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
     $variables['image'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_thumb'];
+    // Pull in logo information and set the jQuery setings.
+    $logo = variable_get('jw_player_cdn_static_url_logo', FALSE);
+    if (!empty($logo)) {
+      $variables['config']['logo.file'] = $logo;
+      $variables['config']['logo.position'] = 'top-left';
+    }
+    $skin = variable_get('jw_player_cdn_static_url_skin_pro');
+    if ($skin != 0) {
+      $skins_available = jw_player_cdn_pro_skin_list();
+      $variables['config']['skin'] = drupal_strtolower($skins_available[$skin]);
+    }
+    $skin_custom = variable_get('jw_player_cdn_static_url_skin_custom');
+    if (!empty($skin_custom)) {
+      $variables['config']['skin'] = $skin_custom;
+    }
     // @TODO Implement presets using CTools.
+    // Load CTools presets here.
     // Merge all variables together. Preset settings take priority over defaults,
     // variables passed directly to the theme function take priority over both.
     $variables = array_merge($default_settings, $variables);
     // Copy player variables into their own array to be set as JavaScript
     // configuration.
-    // @todo Bad smell here. Refactoring needed.
     $player_variables = array('width', 'height', 'image', 'controls', 'skin', 'autoplay');
     foreach ($player_variables as $key) {
       if (!empty($variables[$key])) {
@@ -239,11 +254,14 @@ function jw_player_cdn_preprocess_node(&$variables) {
     drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
     drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
     drupal_add_js(array('jw_player_cdn' => array($variables['html_id'] => $variables['config'])), 'setting'); // Player settings
-    // Set the JW Player License if it has been supplied in settings.
+    // Set the JW Player License if it has been supplied in settings. 
     $license = variable_get('jw_player_cdn_license_key', NULL);
     if (!empty($license)) {
-      $jshead = '<script type="text/javascript">jwplayer.key="' . $license . '";</script>';
-      drupal_add_js($jshead);
+      drupal_add_js('jwplayer.key=' . drupal_json_encode($license), array(
+        'type' => 'inline',
+        'scope' => 'header',
+        'weight' => 5
+      ));
     }
   }
 }
@@ -320,4 +338,22 @@ function jw_player_cdn_default_settings() {
   }
 
   return $defaults;
+}
+
+/**
+ * Returns the list of Pro skins offered by JW Player
+ */
+function jw_player_cdn_pro_skin_list() {
+  $options = array(
+    0 => t('-Select-'),
+    1 => t('Six'),
+    2 => t('Beelden'),
+    3 => t('Bekle'),
+    4 => t('Five'),
+    5 => t('Glow'),
+    6 => t('Roundster'),
+    7 => t('Stormtrooper'),
+    8 => t('Vapor'),
+  );
+  return $options;
 }
