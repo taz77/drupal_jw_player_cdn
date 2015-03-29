@@ -92,10 +92,10 @@ function jw_player_cdn_field_widget_form(&$form, &$form_state, $field, $instance
   );
   foreach (array('video' => t('Video URL'), 'thumb' => t('Thumbnail URL')) as $key => $title) {
     if ($key == 'video') {
-      $description = t('Provide the URL to the video.');
+      $description = t('Provide the URL to the video. This is a signed URL.');
     }
     if ($key == 'thumb') {
-      $description = t('Provide the URL to the thumbnail for this video.');
+      $description = t('Provide the URL to the thumbnail for this video. This is a signed URL.');
     }
     $element[$key] = array(
       '#type' => 'textfield',
