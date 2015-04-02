@@ -4,3 +4,6 @@ package = Media
 core = 7.x
 dependencies[] = libraries
 dependencies[] = ctools
+
+; Required default styles
+stylesheets[screen][] = css/jw-player-cdn.css
