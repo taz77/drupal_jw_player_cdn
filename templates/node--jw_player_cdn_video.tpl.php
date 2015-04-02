@@ -15,10 +15,7 @@
     // Get our URL query variables.
     $options = drupal_get_query_parameters();
     ?>
-    <div class="jwplayer-video">
-      <video id="<?php print $html_id ?>" width="<?php print $width ?>" height="<?php print $height ?>" controls="controls" preload="none"<?php if (isset($image)) : ?> poster="<?php print $image ?>"<?php endif ?>>
-        <source src="<?php print $file_url ?>" />
-      </video>
+    <div id="<?php print $html_id ?>" class="jwplayer-video">Loading Video Player...
     </div>
     <?php
     // Display our video player that will load the initial segment.
@@ -28,5 +25,8 @@
     // Print all of the segments for this video.
     print render($content['jw_player_cdn_video_series']);
     ?>
+    <div class="node-jw_player_cdn_video_footer clearfix">
+      Links on this page are subject to expire after a certain amount of time. If you have problems with any links on this site, please refresh the page.
+    </div>
   </div>
 </article>
