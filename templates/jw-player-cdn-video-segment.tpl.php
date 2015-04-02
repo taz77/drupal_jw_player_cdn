@@ -40,7 +40,7 @@ $image = theme('image', $variables);
       <?php print $segment_length; ?>
     </div>
     <div class="jw-player-cdn-video-series-thumb">
-      <?php print $image; ?>
+      <a href="<?php echo url(current_path(), array('query' => $query)); ?>"><?php print $image; ?></a>
     </div>
   </div>
 </div>
