@@ -15,7 +15,7 @@ module_load_include('inc', 'jw_player_cdn', 'services/cloudfront');
  */
 function jw_player_cdn_menu() {
   $items = array();
-  $items['admin/config/media/jw_player_cdn/settings'] = array(
+  $items['admin/config/media/jw_player_cdn'] = array(
     'title' => 'JW Player CDN Settings',
     'description' => 'JW Player CDN Setting Page',
     'page callback' => 'drupal_get_form',
@@ -205,22 +205,22 @@ function jw_player_cdn_preprocess_node(&$variables) {
   if ($node->type == 'jw_player_cdn_video') {
     $options = array();
     $options = drupal_get_query_parameters();
-    if (isset($options['vid'])) {
+    if (!empty($options['vid'])) {
       $vid = check_plain($options['vid']);
     }
     else {
       $vid = 0;
     }
-    // Load defaults as the starting point.
+    // Load defaults as the starting point and override below as necessary.
     $default_settings = jw_player_cdn_default_settings();
     // Give each instance of the player a unique id. A random hash is used in
     // place of drupal_html_id() due to potentially conflicting ids in cases where
     // the entire output of the theme function is cached.
-    $variables['html_id'] = md5(rand());
+    $variables['html_id'] = drupal_html_id('jwplayercdn' . $node->nid);
 
+    // Create a configuration array which will be passed to JWPlayer's JavaScript.
     $variables['jw_player_cdn_video_data'] = _jw_player_video_load($vid, $node->nid);
     $variables['file_url'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
-    // Create a configuration array which will be passed to JWPlayer's JavaScript.
     $variables['config']['file'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_video'];
     $variables['image'] = $variables['jw_player_cdn_video_data']['jw_video_cdn_thumb'];
     // Pull in logo information and set the jQuery setings.
@@ -245,15 +245,28 @@ function jw_player_cdn_preprocess_node(&$variables) {
     $variables = array_merge($default_settings, $variables);
     // Copy player variables into their own array to be set as JavaScript
     // configuration.
-    $player_variables = array('width', 'height', 'image', 'controls', 'skin', 'autoplay');
+    $player_variables = array(
+      'width',
+      'height',
+      'image',
+      'controls',
+      'autoplay',
+      'aspectratio',
+      'primary',
+    );
     foreach ($player_variables as $key) {
       if (!empty($variables[$key])) {
         $variables['config'][$key] = $variables[$key];
       }
     }
+    // Start overriding default settings.
+    $aspectratio = variable_get('jw_player_cdn_video_player_ratio');
+    // If an aspect ratio has been set we use it.
+    if (!empty($aspectratio)) {
+      $ratios = jw_player_cdn_video_aspect_ratios();
+      $variables['config']['aspectratio'] = $ratios[$aspectratio];
+    }
     drupal_add_js(libraries_get_path('jwplayer') . '/jwplayer.js'); // Add library
-    drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
-    drupal_add_js(array('jw_player_cdn' => array($variables['html_id'] => $variables['config'])), 'setting'); // Player settings
     // Set the JW Player License if it has been supplied in settings. 
     $license = variable_get('jw_player_cdn_license_key', NULL);
     if (!empty($license)) {
@@ -263,25 +276,8 @@ function jw_player_cdn_preprocess_node(&$variables) {
         'weight' => 5
       ));
     }
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_api().
- */
-function jw_player_cdn_ctools_plugin_api($owner, $api) {
-  if ($owner == 'jw_player_cdn' && $api == 'jw_player_cdn_presets') {
-    return array('version' => 1);
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function jw_player_cdn_ctools_plugin_directory($module, $type) {
-  // Load the export_ui plugin.
-  if ($type == 'export_ui') {
-    return 'plugins/export_ui';
+    drupal_add_js(drupal_get_path('module', 'jw_player_cdn') . '/jw_player_cdn.js'); // Attaches JW Player element
+    drupal_add_js(array('jw_player_cdn' => array($variables['html_id'] => $variables['config'])), 'setting'); // Player settings
   }
 }
 
@@ -297,30 +293,6 @@ function _jw_player_video_load($vidload, $nid = NULL) {
 }
 
 /**
- * Load the given preset(s).
- * @param string $machine_name
- * @return array
- */
-function jw_player_cdn_preset_load($machine_name = NULL) {
-  ctools_include('export');
-  if (isset($machine_name)) {
-    $items = ctools_export_crud_load('jw_player_cdn_preset', $machine_name);
-    // CTools returns an object, so we explictly typecast it to array before
-    // returning.
-    return $items = (array) $items;
-  }
-  else {
-    $result = ctools_export_crud_load_all('jw_player_cdn_preset');
-    if (!empty($result)) {
-      foreach ($result as $key => $item) {
-        $items[$key] = (array) $item;
-      }
-      return $items;
-    }
-  }
-}
-
-/**
  * Returns the default settings for JW Player CDN. Used in cases where a preset is
  * not provided when the JW Player CDN theme function is called.
  */
@@ -330,10 +302,11 @@ function jw_player_cdn_default_settings() {
   if (!isset($defaults)) {
     $defaults = array(
       'flashplayer' => file_create_url(libraries_get_path('jwplayer') . '/jwplayer.flash.swf'),
-      'width' => '640',
-      'height' => '480',
+      'width' => '100%',
       'autoplay' => FALSE,
       'controls' => 'bottom',
+      'aspectratio' => '16:9',
+      'primary' => 'html5',
     );
   }
 
@@ -354,6 +327,23 @@ function jw_player_cdn_pro_skin_list() {
     6 => t('Roundster'),
     7 => t('Stormtrooper'),
     8 => t('Vapor'),
+  );
+  return $options;
+}
+
+/**
+ * Returns common aspect ratios for video player settings
+ */
+function jw_player_cdn_video_aspect_ratios() {
+  $options = array(
+    0 => t('-Select-'),
+    1 => t('4:3'),
+    2 => t('5:3'),
+    3 => t('5:4'),
+    4 => t('16:9'),
+    5 => t('16:10'),
+    6 => t('16.18:10'),
+    7 => t('21:9'),
   );
   return $options;
 }
