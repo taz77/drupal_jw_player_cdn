@@ -93,5 +93,17 @@ function jw_player_cdn_admin($form, &$form_state) {
     '#title' => t('Thumbnail Height'),
     '#default_value' => variable_get('jw_player_cdn_thumbnail_height', FALSE) ? variable_get('jw_player_cdn_thumbnail_height') : '80',
   );
+  $form['jw_player_cdn_video_player'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Video Player Settings'),
+    '#collapsible' => FALSE,
+  );
+    $form['jw_player_cdn_video_player']['jw_player_cdn_video_player_ratio'] = array(
+    '#type' => 'select',
+    '#title' => t('Video Player Ratio Setting'),
+    '#description' => t('This module uses ratios to set the size of the player. This allows the video player to be responsive to the size of the screen and mobile friendly.'),
+    '#default_value' => variable_get('jw_player_cdn_video_player_ratio') ? variable_get('jw_player_cdn_video_player_ratio') : 0,
+    '#options' => jw_player_cdn_video_aspect_ratios(),
+  );
   return system_settings_form($form);
 }
